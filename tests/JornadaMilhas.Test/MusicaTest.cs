@@ -17,7 +17,9 @@ public class MusicaTest
     {
         string nome = "Música teste";
         int id = 13;
+        
         Musica musica = new Musica(nome) {Id = id};
+        
         Assert.Equal(id, musica.Id);
     }
     
