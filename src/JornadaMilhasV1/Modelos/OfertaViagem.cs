@@ -7,20 +7,30 @@ using JornadaMilhasV1.Validador;
 
 namespace JornadaMilhasV1.Modelos;
 
-public class OfertaViagem: Valida
+public class OfertaViagem : Valida
 {
+
+    public const double DESCONTO_MAXIMO = 0.7;
     private double _desconto;
     public int Id { get; set; }
-    public Rota Rota { get; set; } 
+    public Rota Rota { get; set; }
     public Periodo Periodo { get; set; }
     public double Preco { get; set; }
+
     public double Desconto
     {
         get => _desconto;
-        set 
+        set
         {
             _desconto = value;
-            Preco -= _desconto;
+            if (_desconto >= Preco)
+            {
+                Preco *= (1 - DESCONTO_MAXIMO);
+            }
+            else
+            {
+                Preco -= _desconto;
+            }
         }
     }
 
@@ -35,7 +45,8 @@ public class OfertaViagem: Valida
 
     public override string ToString()
     {
-        return $"Origem: {Rota.Origem}, Destino: {Rota.Destino}, Data de Ida: {Periodo.DataInicial.ToShortDateString()}, Data de Volta: {Periodo.DataFinal.ToShortDateString()}, Preço: {Preco:C}";
+        return
+            $"Origem: {Rota.Origem}, Destino: {Rota.Destino}, Data de Ida: {Periodo.DataInicial.ToShortDateString()}, Data de Volta: {Periodo.DataFinal.ToShortDateString()}, Preço: {Preco:C}";
     }
 
     protected override void Validar()
@@ -43,10 +54,11 @@ public class OfertaViagem: Valida
         if (!Periodo.EhValido)
         {
             Erros.RegistrarErro(Periodo.Erros.Sumario);
-        } else if (Rota == null || Periodo == null)
+        }
+        else if (Rota == null || Periodo == null)
         {
             Erros.RegistrarErro("A oferta de viagem não possui rota ou período válidos.");
-        } 
+        }
         else if (Preco <= 0)
         {
             Erros.RegistrarErro("O preço da oferta de viagem deve ser maior que zero.");
